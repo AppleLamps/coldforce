@@ -241,6 +241,46 @@ function fillPostCard(post, description, li) {
   share.appendChild(document.createTextNode(" Share on X"));
   actions.appendChild(share);
   li.appendChild(actions);
+
+  const credit = document.createElement("p");
+  credit.className = "post-credit";
+  const creditLink = document.createElement("a");
+  creditLink.href = "https://x.com/lamps_apple";
+  creditLink.target = "_blank";
+  creditLink.rel = "noopener noreferrer";
+  creditLink.textContent = "@lamps_apple";
+  credit.append("Credit: ", creditLink);
+  li.appendChild(credit);
+}
+
+function initThemeToggle() {
+  const root = document.documentElement;
+  const btn = document.getElementById("themeToggle");
+  const meta = document.querySelector('meta[name="color-scheme"]');
+
+  function apply(theme) {
+    root.setAttribute("data-theme", theme);
+    if (meta) meta.setAttribute("content", theme === "light" ? "light dark" : "dark light");
+    if (btn) {
+      const isLight = theme === "light";
+      btn.setAttribute("aria-pressed", isLight ? "true" : "false");
+      btn.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
+    }
+  }
+
+  apply(root.getAttribute("data-theme") === "light" ? "light" : "dark");
+
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      try {
+        localStorage.setItem("theme", next);
+      } catch (e) {
+        /* localStorage may be unavailable */
+      }
+      apply(next);
+    });
+  }
 }
 
 /**
@@ -289,6 +329,7 @@ function debounce(fn, delay) {
 }
 
 function main() {
+  initThemeToggle();
   const statusBlock = document.getElementById("statusBlock");
   const statusEl = document.getElementById("status");
   const postsEl = document.getElementById("posts");
