@@ -13,7 +13,7 @@ const SHARE_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" s
 
 const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
 const SHARE_NAME = "Cole Allen";
-const SHARE_HANDLE = "@coldforce.bsky.social";
+const SHARE_HANDLE = "coldforce.bsky.social";
 const PUBLIC_SITE_URL = "https://coldforce.vercel.app/";
 
 /**
