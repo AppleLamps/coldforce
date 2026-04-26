@@ -9,8 +9,12 @@ const EMBED_SPLIT = /\n\n\[contains quote post or other embedded content\]\s*$/i
 const BSKY_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
 const ARCHIVE_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v5h5"/><path d="M21 21v-5h-5"/><path d="M3 12a9 9 0 0 0 6 8.4"/><path d="M21 12a9 9 0 0 1-6-8.4"/></svg>`;
 const EMBED_SVG = `<svg class="post-embed-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1" opacity=".6"/><rect x="4" y="13" width="7" height="7" rx="1" opacity=".6"/></svg>`;
+const SHARE_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg>`;
 
 const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+const SHARE_NAME = "Cole Allen";
+const SHARE_HANDLE = "@coldforce.bsky.social";
+const PUBLIC_SITE_URL = "https://coldforce.vercel.app/";
 
 /**
  * @param {Date} date
@@ -79,12 +83,64 @@ function linkifyText(text) {
 }
 
 /**
+ * @param {string} text
+ * @param {number} max
+ */
+function truncateForShare(text, max) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= max) return clean;
+  return `${clean.slice(0, Math.max(0, max - 1)).trimEnd()}…`;
+}
+
+/**
+ * @param {Post} post
+ */
+function getPostAnchor(post) {
+  if (!post.rkey) return "";
+  return `post-${post.rkey.replace(/[^a-z0-9_-]/gi, "-")}`;
+}
+
+/**
+ * @param {Post} post
+ */
+function getPostShareUrl(post) {
+  const anchor = getPostAnchor(post);
+  return anchor ? `${PUBLIC_SITE_URL}#${anchor}` : PUBLIC_SITE_URL;
+}
+
+/**
+ * @param {Post} post
+ * @param {string} displayText
+ * @param {string | undefined} rawDate
+ */
+function makeXShareUrl(post, displayText, rawDate) {
+  const d = rawDate ? new Date(rawDate) : null;
+  const dateText =
+    d && !isNaN(d.getTime())
+      ? d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
+      : rawDate || "Undated post";
+  const context = displayText
+    ? `"${truncateForShare(displayText, 170)}"`
+    : "Post includes quoted or embedded content.";
+  const text = `${SHARE_NAME} (${SHARE_HANDLE})\n${dateText}\n\n${context}`;
+  const params = new URLSearchParams({
+    text,
+    url: getPostShareUrl(post),
+  });
+  return `https://twitter.com/intent/tweet?${params.toString()}`;
+}
+
+/**
  * @param {Post} post
  * @param {string} description
  * @param {HTMLLIElement} li
  */
 function fillPostCard(post, description, li) {
   li.className = "post";
+  const anchor = getPostAnchor(post);
+  if (anchor) {
+    li.id = anchor;
+  }
   const meta = post.meta || {};
   const tw = meta["twitter:value1"];
   let displayText = description;
@@ -176,6 +232,14 @@ function fillPostCard(post, description, li) {
     wb.appendChild(document.createTextNode(" Archived"));
     actions.appendChild(wb);
   }
+  const share = document.createElement("a");
+  share.href = makeXShareUrl(post, displayText, tw);
+  share.target = "_blank";
+  share.rel = "noopener noreferrer";
+  share.setAttribute("aria-label", "Share this post on X");
+  share.insertAdjacentHTML("afterbegin", SHARE_SVG);
+  share.appendChild(document.createTextNode(" Share on X"));
+  actions.appendChild(share);
   li.appendChild(actions);
 }
 
@@ -198,6 +262,15 @@ function syncStickyVar() {
     "--sticky-h",
     `${h}px`
   );
+}
+
+function scrollHashPostIntoView() {
+  if (!location.hash) return;
+  const target = document.getElementById(location.hash.slice(1));
+  if (!target) return;
+  requestAnimationFrame(() => {
+    target.scrollIntoView({ block: "start" });
+  });
 }
 
 /**
@@ -393,6 +466,7 @@ function main() {
       requestAnimationFrame(() => {
         syncStickyVar();
         onScroll();
+        scrollHashPostIntoView();
       });
       applyFilter();
     })
