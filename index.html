@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light" />
-    <title>coldforce.bsky.social / archive</title>
+    <meta name="color-scheme" content="dark" />
+    <title>COLDFORCE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
@@ -18,24 +18,15 @@
         <div class="hero-grid" aria-hidden="true">
           <span></span><span></span><span></span><span></span>
         </div>
-        <p class="eyebrow">/ Bluesky archive / local snapshot</p>
+        <p class="eyebrow">Bluesky posts</p>
         <div class="identity">
           <div class="avatar" aria-hidden="true">cf</div>
           <div class="identity-text">
-            <h1 class="title">@coldforce.bsky<wbr />.social</h1>
+            <h1 class="title">COLDFORCE</h1>
             <p class="meta-line" id="sourceMeta"></p>
           </div>
         </div>
-        <p class="hero-copy">A searchable record of public posts, direct source links, and preserved Wayback snapshots. No feed polish. Just the record.</p>
-        <div class="hero-command" aria-hidden="true">
-          <span class="prompt">&gt;</span>
-          <span>grep --ignore-case "anything" coldforce_posts.json</span>
-          <span class="cursor"></span>
-        </div>
-        <details class="note-box" id="dataNote" hidden>
-          <summary>About this archive</summary>
-          <p class="note" id="dataNoteText"></p>
-        </details>
+        <p class="hero-copy">Search and browse the latest saved posts from Coldforce.</p>
       </header>
 
       <div class="sticky-bar" data-stuck="false" id="stickyBar" role="search">
@@ -52,7 +43,7 @@
               type="search"
               id="search"
               class="search"
-              placeholder="Filter by text or post id…"
+              placeholder="Search posts…"
               autocomplete="off"
               inputmode="search"
               enterkeyhint="search"

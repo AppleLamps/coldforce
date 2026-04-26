@@ -173,7 +173,7 @@ function fillPostCard(post, description, li) {
     wb.target = "_blank";
     wb.rel = "noopener noreferrer";
     wb.insertAdjacentHTML("afterbegin", ARCHIVE_SVG);
-    wb.appendChild(document.createTextNode(" Wayback"));
+    wb.appendChild(document.createTextNode(" Archived"));
     actions.appendChild(wb);
   }
   li.appendChild(actions);
@@ -221,8 +221,6 @@ function main() {
   const postsEl = document.getElementById("posts");
   const countEl = document.getElementById("count");
   const sourceMeta = document.getElementById("sourceMeta");
-  const dataNote = document.getElementById("dataNote");
-  const dataNoteText = document.getElementById("dataNoteText");
   const searchEl = document.getElementById("search");
   const searchClear = document.getElementById("searchClear");
   const sortEl = document.getElementById("sort");
@@ -237,8 +235,6 @@ function main() {
     !postsEl ||
     !countEl ||
     !sourceMeta ||
-    !dataNote ||
-    !dataNoteText ||
     !searchEl ||
     !searchClear ||
     !sortEl ||
@@ -373,18 +369,8 @@ function main() {
     })
     .then((data) => {
       archive = normalizeData(data);
-      sourceMeta.textContent = [
-        archive.source,
-        archive.profile,
-        archive.post_count != null ? `${archive.post_count} posts` : "",
-      ]
-        .filter(Boolean)
-        .join(" · ");
-
-      if (archive.note) {
-        dataNoteText.textContent = archive.note;
-        dataNote.hidden = false;
-      }
+      sourceMeta.textContent =
+        archive.post_count != null ? `${archive.post_count} posts` : "";
 
       const posts = archive.posts.slice();
       posts.sort((a, b) => {
